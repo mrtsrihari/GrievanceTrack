@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Escalations - GrievanceTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">GrievanceTrack</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="grievances.html">Grievances</a></li>
+                <li class="nav-item"><a class="nav-link active" href="escalations.html">Escalations</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2>Escalation History</h2>
+    <table class="table table-striped table-bordered mt-3">
+        <thead class="table-danger">
+            <tr>
+                <th>ID</th>
+                <th>Grievance No.</th>
+                <th>Escalated At</th>
+                <th>Reason</th>
+                <th>Previous Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody id="escalation-tbody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadEscalations() {
+        fetch('/api/escalations')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('escalation-tbody');
+                tbody.innerHTML = '';
+                data.forEach(e => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${e.id}</td>
+                        <td>${e.grievance.grievanceNumber}</td>
+                        <td>${new Date(e.escalatedAt).toLocaleString()}</td>
+                        <td>${e.reason}</td>
+                        <td>${e.previousStatus}</td>
+                        <td>${e.remarks}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+    loadEscalations();
+</script>
+</body>
+</html>

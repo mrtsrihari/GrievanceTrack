@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories - GrievanceTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">GrievanceTrack</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="grievances.html">Grievances</a></li>
+                <li class="nav-item"><a class="nav-link" href="citizens.html">Citizens</a></li>
+                <li class="nav-item"><a class="nav-link" href="departments.html">Departments</a></li>
+                <li class="nav-item"><a class="nav-link active" href="categories.html">Categories</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2>Grievance Categories</h2>
+    <table class="table table-striped table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Category Name</th>
+                <th>Department</th>
+                <th>SLA (Days)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="category-tbody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadCategories() {
+        fetch('/api/categories')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('category-tbody');
+                tbody.innerHTML = '';
+                data.forEach(c => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.department.name}</td>
+                        <td>${c.slaDays}</td>
+                        <td><span class="badge bg-${c.active ? 'success' : 'secondary'}">${c.active ? 'Active' : 'Inactive'}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+    loadCategories();
+</script>
+</body>
+</html>

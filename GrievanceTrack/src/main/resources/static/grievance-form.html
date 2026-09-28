@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Grievance - GrievanceTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">GrievanceTrack</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="grievances.html">Grievances</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2>File a New Grievance</h2>
+    <div id="message" class="alert d-none"></div>
+    
+    <form id="grievanceForm" onsubmit="submitGrievance(event)">
+        <div class="mb-3">
+            <label>Citizen ID</label>
+            <input type="number" id="citizenId" class="form-control" required placeholder="Enter Citizen ID (e.g. 1)">
+        </div>
+        <div class="mb-3">
+            <label>Category</label>
+            <select id="categoryId" class="form-select" required></select>
+        </div>
+        <div class="mb-3">
+            <label>Title</label>
+            <input type="text" id="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea id="description" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Location</label>
+            <input type="text" id="location" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Priority</label>
+            <select id="priority" class="form-select" required>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="CRITICAL">Critical</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Grievance</button>
+    </form>
+</div>
+
+<script>
+    // Load categories for dropdown
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('categoryId');
+            data.forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c.id;
+                opt.text = c.name + ' (SLA: ' + c.slaDays + ' days)';
+                select.appendChild(opt);
+            });
+        });
+
+    function submitGrievance(e) {
+        e.preventDefault();
+        const payload = {
+            citizenId: document.getElementById('citizenId').value,
+            categoryId: document.getElementById('categoryId').value,
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            location: document.getElementById('location').value,
+            priority: document.getElementById('priority').value
+        };
+
+        fetch('/api/grievances', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(res => {
+            const msg = document.getElementById('message');
+            msg.classList.remove('d-none');
+            if (res.ok) {
+                msg.className = 'alert alert-success';
+                msg.textContent = "Grievance submitted successfully!";
+                document.getElementById('grievanceForm').reset();
+            } else {
+                msg.className = 'alert alert-danger';
+                msg.textContent = "Error submitting grievance. Please check citizen ID.";
+            }
+        });
+    }
+</script>
+</body>
+</html>
